@@ -8,5 +8,10 @@
     "UnityPackageManager",
     "Github"
   ],
+  "author": {
+    "name": "Sonic853",
+    "email": "sonic853@qq.com",
+    "url": "https://github.com/Sonic853"
+  },
   "type": "tool"
 }
