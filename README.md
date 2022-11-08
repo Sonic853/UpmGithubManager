@@ -8,7 +8,7 @@ Manage and upgrade Github package versions
 
 1. Open "Package Manager"
 2. Click "+", then click "Add package from git URL..."
-3. Type "`https://github.com/Sonic853/UpmGithubManager.git#0.1.1`" and press Enter.
+3. Type "`https://github.com/Sonic853/UpmGithubManager.git#0.1.2`" and press Enter.
 4. Done!
 
 # 中文
@@ -19,5 +19,5 @@ Manage and upgrade Github package versions
 
 1. 打开 "Package Manager"
 2. 点击 "+" 号, 然后点击 "Add package from git URL..."。
-3. 输入 "`https://github.com/Sonic853/UpmGithubManager.git#0.1.1`" 后按回车键。
+3. 输入 "`https://github.com/Sonic853/UpmGithubManager.git#0.1.2`" 后按回车键。
 4. 完成！
