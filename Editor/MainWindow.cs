@@ -19,8 +19,8 @@ namespace Sonic853.UpmGithubManager
         static List<string> versions = new List<string>(){
             "custom"
         };
-        static MainWindow instance;
         static string manifestText;
+        static MainWindow instance;
         public static MainWindow getInstance
         {
             get
@@ -113,7 +113,8 @@ namespace Sonic853.UpmGithubManager
                     newUrl += editPanel.versionField.value == "" ? "" : ("#" + editPanel.versionField.value);
                     if (newUrl != selectedItem.url)
                     {
-                        manifest.dependencies[selectedItem.name] = newUrl;
+                        // manifest.dependencies[selectedItem.name] = newUrl;
+                        manifestText = manifestText.Replace(selectedItem.oldUrl, newUrl);
                         foreach (var item in githubItems)
                         {
                             if (item.name == selectedItem.name)
@@ -123,8 +124,9 @@ namespace Sonic853.UpmGithubManager
                             }
                         }
                         selectedItem.url = newUrl;
-                        string newManifestText = JsonConvert.SerializeObject(manifest, Formatting.Indented);
-                        System.IO.File.WriteAllText(manifestPath, newManifestText);
+                        System.IO.File.WriteAllText(manifestPath, manifestText);
+                        // string newManifestText = JsonConvert.SerializeObject(manifest, Formatting.Indented);
+                        // System.IO.File.WriteAllText(manifestPath, newManifestText);
                         Debug.Log("[UPM Github Manager]: Save success!");
                         uGMui.githubList.Refresh();
                         AssetDatabase.Refresh();
