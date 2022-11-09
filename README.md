@@ -1,6 +1,6 @@
 # UPM Github Manager
 
-![Snipaste_2022-11-09_03-16-16](https://user-images.githubusercontent.com/8389962/200655125-b417b32b-c707-428d-810e-6219072d03b5.png)
+![Snipaste_2022-11-09_13-15-07](https://user-images.githubusercontent.com/8389962/200744632-0f70b670-86bb-4118-8837-5759c30be7a2.png)
 
 Manage and upgrade Github package versions
 
