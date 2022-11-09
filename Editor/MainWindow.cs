@@ -62,6 +62,25 @@ namespace Sonic853.UpmGithubManager
             root.styleSheets.Add(EditorGUIUtility.Load(s_StyleSheetPath) as StyleSheet);
             UGMUI uGMui = CreateUI();
             root.Add(uGMui.root);
+            TextField githubToken = new TextField("Github Token")
+            {
+                value = GithubAPI.Token
+            };
+            githubToken.AddToClassList("GithubToken");
+            githubToken.RegisterCallback<ChangeEvent<string>>((evt) =>
+            {
+                GithubAPI.Token = evt.newValue;
+            });
+            root.Add(githubToken);
+            Button getToken = new Button(() =>
+            {
+                Application.OpenURL("https://github.com/settings/tokens");
+            })
+            {
+                text = "Get Token"
+            };
+            getToken.AddToClassList("GetToken");
+            root.Add(getToken);
             // 从 Packages/manifest.json 中读取所有的包
             string manifestPath = Application.dataPath + "/../Packages/manifest.json";
             manifestText = System.IO.File.ReadAllText(manifestPath);
@@ -89,12 +108,12 @@ namespace Sonic853.UpmGithubManager
                 if (selectedItem != null)
                 {
                     string newUrl = editPanel.urlField.value;
-                    newUrl +=  editPanel.pathField.value == "" ? "" : ("?path=" + editPanel.pathField.value);
+                    newUrl += editPanel.pathField.value == "" ? "" : ("?path=" + editPanel.pathField.value);
                     newUrl += editPanel.versionField.value == "" ? "" : ("#" + editPanel.versionField.value);
                     if (newUrl != selectedItem.url)
                     {
                         manifest.dependencies[selectedItem.name] = newUrl;
-                        foreach(var item in githubItems)
+                        foreach (var item in githubItems)
                         {
                             if (item.name == selectedItem.name)
                             {
@@ -106,6 +125,7 @@ namespace Sonic853.UpmGithubManager
                         string newManifestText = JsonConvert.SerializeObject(manifest, Formatting.Indented);
                         System.IO.File.WriteAllText(manifestPath, newManifestText);
                         Debug.Log("[UPM Github Manager]: Save success!");
+                        uGMui.githubList.Refresh();
                         AssetDatabase.Refresh();
                     }
                 }
@@ -116,14 +136,15 @@ namespace Sonic853.UpmGithubManager
         {
             VisualElement root = new VisualElement();
             root.AddToClassList("UGMMain");
-            ListView githubList = new ListView();
+            ListView githubList = new ListView(){
+                itemHeight = 35,
+                makeItem = makeGithubItem,
+                bindItem = bindGithubItem,
+                itemsSource = githubItems,
+                selectionType = SelectionType.Single,
+            };
             githubList.AddToClassList("GithubList");
             githubItems.Clear();
-            githubList.itemHeight = 35;
-            githubList.makeItem = makeGithubItem;
-            githubList.bindItem = bindGithubItem;
-            githubList.itemsSource = githubItems;
-            githubList.selectionType = SelectionType.Single;
             root.Add(githubList);
             root.Add(DragLine.CreateDragLine(githubList));
             editPanel = CreateEditPanelUI();
@@ -139,9 +160,10 @@ namespace Sonic853.UpmGithubManager
         {
             VisualElement root = new VisualElement();
             root.AddToClassList("EditPanel");
-            TextField nameField = new TextField("Name");
+            TextField nameField = new TextField("Name"){
+                isReadOnly = true
+            };
             nameField.AddToClassList("name");
-            nameField.isReadOnly = true;
             root.Add(nameField);
             TextField urlField = new TextField("Url");
             urlField.AddToClassList("url");
@@ -158,9 +180,10 @@ namespace Sonic853.UpmGithubManager
             versionsField.SetEnabled(false);
             versionsVE.Add(versionsField);
             root.Add(versionsVE);
-            Button saveButton = new Button();
+            Button saveButton = new Button(){
+                text = "Save"
+            };
             saveButton.AddToClassList("save");
-            saveButton.text = "Save";
             saveButton.SetEnabled(false);
             urlField.RegisterCallback<ChangeEvent<string>>((evt) =>
             {
@@ -224,6 +247,7 @@ namespace Sonic853.UpmGithubManager
                 pathField.value = item.path;
                 versionField.value = item.version == "#latest#" ? "" : item.version;
                 versionsField.SetEnabled(false);
+                saveButton.SetEnabled(false);
                 var tags = await GithubAPI.GetTags(item.sourceUrl);
                 var branches = await GithubAPI.GetBranches(item.sourceUrl);
                 versions.Clear();

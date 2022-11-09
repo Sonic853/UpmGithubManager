@@ -1,5 +1,6 @@
 ﻿using System.Threading.Tasks;
 using Newtonsoft.Json;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.Networking;
 
@@ -10,7 +11,11 @@ namespace Sonic853.UpmGithubManager
         /// <summary>
         /// 查询用的 Token，如果不填写，每小时只能查询 60 次
         /// </summary>
-        public static string Token;
+        public static string Token
+        {
+            get => EditorPrefs.GetString("Sonic853.UpmGithubManager.GithubAPI.Token", "");
+            set => EditorPrefs.SetString("Sonic853.UpmGithubManager.GithubAPI.Token", value);
+        }
         /// <summary>
         /// 获取所有 Tag
         /// </summary>
@@ -34,7 +39,12 @@ namespace Sonic853.UpmGithubManager
             {
                 www.SetRequestHeader("Authorization", "Bearer " + Token);
             }
-            await www.SendWebRequest();
+            // 不使用 await www.SendWebRequest();
+            www.SendWebRequest();
+            while (!www.isDone)
+            {
+                await Task.Yield();
+            }
             if (www.isNetworkError || www.isHttpError)
             {
                 Debug.LogError(www.error);
@@ -69,7 +79,11 @@ namespace Sonic853.UpmGithubManager
             {
                 www.SetRequestHeader("Authorization", "Bearer " + Token);
             }
-            await www.SendWebRequest();
+            www.SendWebRequest();
+            while (!www.isDone)
+            {
+                await Task.Yield();
+            }
             if (www.isNetworkError || www.isHttpError)
             {
                 Debug.LogError(www.error);

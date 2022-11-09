@@ -28,12 +28,30 @@
     background-color: rgba(0, 0, 0, 0);
 }
 
+.GithubToken {
+    height: 20px;
+    padding-top: 1px;
+    border-top-width: 1px;
+    border-top-color: #232323;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 80px;
+}
+
+.GetToken {
+    width: 78px;
+    position: absolute;
+    bottom: 0;
+    right: 0;
+}
+
 .UGMMain {
     position: absolute;
     top: 0;
     left: 0;
     right: 0;
-    bottom: 0;
+    bottom: 23px;
     flex-grow: 1;
     flex-shrink: 0;
     flex-direction: row;
@@ -45,7 +63,15 @@
 }
 
 .UGMMain>.EditPanel {
+    overflow: hidden;
     flex-basis: 0%;
     flex-grow: 1;
     flex-shrink: 0;
+}
+
+.UGMMain>.EditPanel>.save {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 150px;
 }
