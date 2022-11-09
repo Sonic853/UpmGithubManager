@@ -13,6 +13,7 @@ namespace Sonic853.UpmGithubManager
             /// URL
             /// </summary>
             // url = https://github.com/Username/Repo.git?path=/Packages/com.your.package#6.6.6
+            // url = ssh://git@github.com/Username/Repo.git?path=/Packages/com.your.package#6.6.6
             public string url
             {
                 get

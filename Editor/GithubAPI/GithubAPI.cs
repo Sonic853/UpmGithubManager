@@ -24,6 +24,7 @@ namespace Sonic853.UpmGithubManager
         public static async Task<string[]> GetTags(string url)
         {
             // url = https://github.com/Username/Repo.git
+            // url = ssh://git@github.com/Username/Repo.git
             // 从 url 获取 Username/Repo，去掉 .git
             string[] urlSplit = url.Split('/');
             string repo = urlSplit[urlSplit.Length - 1];
@@ -61,10 +62,13 @@ namespace Sonic853.UpmGithubManager
                 return tags;
             }
         }
+        /// <summary>
+        /// 获取所有 Branch
+        /// </summary>
+        /// <param name="url"></param>
+        /// <returns></returns>
         public static async Task<string[]> GetBranches(string url)
         {
-            // url = https://github.com/Username/Repo.git
-            // 从 url 获取 Username/Repo，去掉 .git
             string[] urlSplit = url.Split('/');
             string repo = urlSplit[urlSplit.Length - 1];
             if (repo.EndsWith(".git"))

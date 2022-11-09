@@ -87,7 +87,8 @@ namespace Sonic853.UpmGithubManager
             manifest manifest = JsonConvert.DeserializeObject<manifest>(manifestText);
             foreach (KeyValuePair<string, string> item in manifest.dependencies)
             {
-                if (item.Value.StartsWith("https://github.com"))
+                if (item.Value.StartsWith("https://github.com")
+                || item.Value.StartsWith("ssh://git@github.com"))
                 {
                     // Debug.Log(item.Key + " " + item.Value);
                     uGMui.githubItems.Add(new GithubItem()
