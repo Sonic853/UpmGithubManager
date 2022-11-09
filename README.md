@@ -4,7 +4,14 @@
 
 Manage and upgrade Github package versions
 
-### Install
+### Install using OpenUPM
+
+```command
+openupm add com.sonic853.upm-github-manager
+```
+
+
+### Install using Package Manager
 
 1. Open "Package Manager"
 2. Click "+", then click "Add package from git URL..."
@@ -15,7 +22,13 @@ Manage and upgrade Github package versions
 
 管理和升级 Github 包版本
 
-### 安装
+### 通过 OpenUPM 安装
+
+```command
+openupm-cn add com.sonic853.upm-github-manager
+```
+
+### 通过 Package Manager 安装
 
 1. 打开 "Package Manager"
 2. 点击 "+" 号, 然后点击 "Add package from git URL..."。
