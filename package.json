@@ -1,9 +1,9 @@
 {
   "name": "com.sonic853.upm-github-manager",
   "displayName": "UPM Github Manager",
-  "version": "0.2.2",
+  "version": "0.3.0",
   "unity": "2019.4",
-  "description": "Manage and upgrade Github package versions",
+  "description": "Manage, switch and upgrade Github package and Gitee package versions",
   "dependencies": {
     "com.unity.nuget.newtonsoft-json": "2.0.2"
   },

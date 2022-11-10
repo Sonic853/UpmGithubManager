@@ -6,15 +6,15 @@ using UnityEngine.Networking;
 
 namespace Sonic853.UpmGithubManager
 {
-    class GithubAPI
+    public class GiteeAPI
     {
         /// <summary>
         /// 查询用的 Token，如果不填写，每小时只能查询 60 次
         /// </summary>
         public static string Token
         {
-            get => EditorPrefs.GetString("Sonic853.UpmGithubManager.GithubAPI.Token", "");
-            set => EditorPrefs.SetString("Sonic853.UpmGithubManager.GithubAPI.Token", value);
+            get => EditorPrefs.GetString("Sonic853.UpmGithubManager.GiteeAPI.Token", "");
+            set => EditorPrefs.SetString("Sonic853.UpmGithubManager.GiteeAPI.Token", value);
         }
         /// <summary>
         /// 获取所有 Tag
@@ -23,8 +23,8 @@ namespace Sonic853.UpmGithubManager
         /// <returns></returns>
         public static async Task<string[]> GetTags(string url)
         {
-            // url = https://github.com/Username/Repo.git
-            // url = ssh://git@github.com/Username/Repo.git
+            // url = https://gitee.com/Username/Repo.git
+            // url = ssh://git@gitee.com/Username/Repo.git
             // 从 url 获取 Username/Repo，去掉 .git
             string[] urlSplit = url.Split('/');
             string repo = urlSplit[urlSplit.Length - 1];
@@ -33,13 +33,13 @@ namespace Sonic853.UpmGithubManager
                 repo = repo.Substring(0, repo.Length - 4);
             }
             string username = urlSplit[urlSplit.Length - 2];
-            // https://api.github.com/repos/Username/Repo/tags
-            string apiUrl = string.Format("https://api.github.com/repos/{0}/{1}/tags", username, repo);
-            UnityWebRequest www = UnityWebRequest.Get(apiUrl);
+            // https://gitee.com/api/v5/repos/Username/Repo/tags
+            string apiUrl = string.Format("https://gitee.com/api/v5/repos/{0}/{1}/tags", username, repo);
             if (Token != null)
             {
-                www.SetRequestHeader("Authorization", "Bearer " + Token);
+                apiUrl += "?access_token=" + Token;
             }
+            UnityWebRequest www = UnityWebRequest.Get(apiUrl);
             // 不使用 await www.SendWebRequest();
             www.SendWebRequest();
             while (!www.isDone)
@@ -53,7 +53,7 @@ namespace Sonic853.UpmGithubManager
             }
             else
             {
-                var _result = JsonConvert.DeserializeObject<GithubAPITag[]>(www.downloadHandler.text);
+                var _result = JsonConvert.DeserializeObject<GiteeAPITag[]>(www.downloadHandler.text);
                 string[] tags = new string[_result.Length];
                 for (int i = 0; i < _result.Length; i++)
                 {
@@ -76,13 +76,12 @@ namespace Sonic853.UpmGithubManager
                 repo = repo.Substring(0, repo.Length - 4);
             }
             string username = urlSplit[urlSplit.Length - 2];
-            // https://api.github.com/repos/Username/Repo/branches
-            string apiUrl = string.Format("https://api.github.com/repos/{0}/{1}/branches", username, repo);
-            UnityWebRequest www = UnityWebRequest.Get(apiUrl);
+            string apiUrl = string.Format("https://gitee.com/api/v5/repos/{0}/{1}/branches", username, repo);
             if (Token != null)
             {
-                www.SetRequestHeader("Authorization", "Bearer " + Token);
+                apiUrl += "?access_token=" + Token;
             }
+            UnityWebRequest www = UnityWebRequest.Get(apiUrl);
             www.SendWebRequest();
             while (!www.isDone)
             {
@@ -95,7 +94,7 @@ namespace Sonic853.UpmGithubManager
             }
             else
             {
-                var _result = JsonConvert.DeserializeObject<GithubAPIBranche[]>(www.downloadHandler.text);
+                var _result = JsonConvert.DeserializeObject<GiteeAPIBranche[]>(www.downloadHandler.text);
                 string[] branches = new string[_result.Length];
                 for (int i = 0; i < _result.Length; i++)
                 {

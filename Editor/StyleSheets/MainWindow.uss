@@ -28,7 +28,7 @@
     background-color: rgba(0, 0, 0, 0);
 }
 
-.GithubToken {
+.TokenPanel {
     height: 20px;
     padding-top: 1px;
     border-top-width: 1px;
@@ -36,13 +36,41 @@
     position: absolute;
     bottom: 0;
     left: 0;
+    right: 0;
+    flex-grow: 1;
+    flex-shrink: 0;
+    flex-direction: row;
+}
+
+.GitHubTokenPanel,
+.GiteeTokenPanel {
+    position: relative;
+    height: 20px;
+    flex-basis: 0%;
+    flex-grow: 1;
+    flex-shrink: 0;
+    bottom: 1px;
+}
+
+.TokenPanel .GithubToken,
+.TokenPanel .GiteeToken {
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 1px;
     right: 80px;
 }
 
-.GetToken {
+.TokenPanel .GithubToken>Label,
+.TokenPanel .GiteeToken>Label {
+    min-width: 80px;
+}
+
+.TokenPanel .GetToken {
     width: 78px;
     position: absolute;
-    bottom: 0;
+    top: 0;
+    bottom: 1px;
     right: 0;
 }
 
@@ -57,7 +85,7 @@
     flex-direction: row;
 }
 
-.UGMMain>.GithubList {
+.UGMMain>.GitList {
     overflow: hidden;
     min-width: 200px;
 }

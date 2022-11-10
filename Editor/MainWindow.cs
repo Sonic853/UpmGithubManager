@@ -13,8 +13,8 @@ namespace Sonic853.UpmGithubManager
     {
         private const string ResourcesPath = "Packages/com.sonic853.upm-github-manager/Editor/StyleSheets/";
         private const string s_StyleSheetPath = ResourcesPath + "MainWindow.uss";
-        static List<GithubItem> githubItems = new List<GithubItem>();
-        static GithubItem selectedItem;
+        static List<GitItem> gitItems = new List<GitItem>();
+        static GitItem selectedItem;
         static EditPanelUI editPanel;
         static List<string> versions = new List<string>(){
             "custom"
@@ -62,25 +62,8 @@ namespace Sonic853.UpmGithubManager
             root.styleSheets.Add(EditorGUIUtility.Load(s_StyleSheetPath) as StyleSheet);
             UGMUI uGMui = CreateUI();
             root.Add(uGMui.root);
-            TextField githubToken = new TextField("Github Token")
-            {
-                value = GithubAPI.Token
-            };
-            githubToken.AddToClassList("GithubToken");
-            githubToken.RegisterCallback<ChangeEvent<string>>((evt) =>
-            {
-                GithubAPI.Token = evt.newValue;
-            });
-            root.Add(githubToken);
-            Button getToken = new Button(() =>
-            {
-                Application.OpenURL("https://github.com/settings/tokens");
-            })
-            {
-                text = "Get Token"
-            };
-            getToken.AddToClassList("GetToken");
-            root.Add(getToken);
+            var tokenPanel = CreateTokenUI();
+            root.Add(tokenPanel);
             // 从 Packages/manifest.json 中读取所有的包
             string manifestPath = Application.dataPath + "/../Packages/manifest.json";
             manifestText = System.IO.File.ReadAllText(manifestPath);
@@ -88,34 +71,37 @@ namespace Sonic853.UpmGithubManager
             foreach (KeyValuePair<string, string> item in manifest.dependencies)
             {
                 if (item.Value.StartsWith("https://github.com")
-                || item.Value.StartsWith("ssh://git@github.com"))
+                || item.Value.StartsWith("ssh://git@github.com")
+                || item.Value.StartsWith("https://gitee.com")
+                || item.Value.StartsWith("ssh://git@gitee.com"))
                 {
                     // Debug.Log(item.Key + " " + item.Value);
-                    uGMui.githubItems.Add(new GithubItem()
+                    uGMui.gitItems.Add(new GitItem()
                     {
                         name = item.Key,
                         url = item.Value
                     });
                 }
             }
-            uGMui.githubList.Refresh();
-            uGMui.githubList.onItemChosen += (item) =>
+            uGMui.gitList.Refresh();
+            uGMui.gitList.onItemChosen += (item) =>
             {
-                selectedItem = item as GithubItem;
+                selectedItem = item as GitItem;
                 editPanel.SetItem(selectedItem).ContinueWith((task) => { });
             };
             editPanel.saveButton.clicked += () =>
             {
                 if (selectedItem != null)
                 {
-                    string newUrl = editPanel.urlField.value;
-                    newUrl += editPanel.pathField.value == "" ? "" : ("?path=" + editPanel.pathField.value);
-                    newUrl += editPanel.versionField.value == "" ? "" : ("#" + editPanel.versionField.value);
-                    if (newUrl != selectedItem.url)
+                    string newUrl = editPanel.urlField.value.Trim();
+                    newUrl += string.IsNullOrEmpty(editPanel.pathField.value.Trim()) ? "" : ("?path=" + editPanel.pathField.value.Trim());
+                    newUrl += string.IsNullOrEmpty(editPanel.versionField.value.Trim()) ? "" : ("#" + editPanel.versionField.value.Trim());
+                    if (newUrl != selectedItem.url
+                    && !string.IsNullOrEmpty(newUrl))
                     {
                         // manifest.dependencies[selectedItem.name] = newUrl;
                         manifestText = manifestText.Replace(selectedItem.oldUrl, newUrl);
-                        foreach (var item in githubItems)
+                        foreach (var item in gitItems)
                         {
                             if (item.name == selectedItem.name)
                             {
@@ -128,35 +114,35 @@ namespace Sonic853.UpmGithubManager
                         // string newManifestText = JsonConvert.SerializeObject(manifest, Formatting.Indented);
                         // System.IO.File.WriteAllText(manifestPath, newManifestText);
                         Debug.Log("[UPM Github Manager]: Save success!");
-                        uGMui.githubList.Refresh();
+                        uGMui.gitList.Refresh();
                         AssetDatabase.Refresh();
                     }
                 }
             };
-            // Debug.Log(uGMui.githubList.itemsSource.Count);
+            // Debug.Log(uGMui.gitList.itemsSource.Count);
         }
         UGMUI CreateUI()
         {
             VisualElement root = new VisualElement();
             root.AddToClassList("UGMMain");
-            ListView githubList = new ListView(){
+            ListView gitList = new ListView(){
                 itemHeight = 35,
-                makeItem = makeGithubItem,
-                bindItem = bindGithubItem,
-                itemsSource = githubItems,
+                makeItem = makeGitItem,
+                bindItem = bindGitItem,
+                itemsSource = gitItems,
                 selectionType = SelectionType.Single,
             };
-            githubList.AddToClassList("GithubList");
-            githubItems.Clear();
-            root.Add(githubList);
-            root.Add(DragLine.CreateDragLine(githubList));
+            gitList.AddToClassList("GitList");
+            gitItems.Clear();
+            root.Add(gitList);
+            root.Add(DragLine.CreateDragLine(gitList));
             editPanel = CreateEditPanelUI();
             root.Add(editPanel.root);
             return new UGMUI()
             {
                 root = root,
-                githubList = githubList,
-                githubItems = githubItems
+                gitList = gitList,
+                gitItems = gitItems
             };
         }
         EditPanelUI CreateEditPanelUI()
@@ -218,6 +204,58 @@ namespace Sonic853.UpmGithubManager
                 saveButton = saveButton
             };
         }
+        VisualElement CreateTokenUI()
+        {
+            VisualElement root = new VisualElement();
+            root.AddToClassList("TokenPanel");
+            VisualElement ghTPanel = new VisualElement();
+            ghTPanel.AddToClassList("GitHubTokenPanel");
+            TextField githubToken = new TextField("Github Token")
+            {
+                value = GithubAPI.Token,
+                isPasswordField = true
+            };
+            githubToken.AddToClassList("GithubToken");
+            githubToken.RegisterCallback<ChangeEvent<string>>((evt) =>
+            {
+                GithubAPI.Token = evt.newValue;
+            });
+            ghTPanel.Add(githubToken);
+            Button ghGetToken = new Button(() =>
+            {
+                Application.OpenURL("https://github.com/settings/tokens");
+            })
+            {
+                text = "Get Token"
+            };
+            ghGetToken.AddToClassList("GetToken");
+            ghTPanel.Add(ghGetToken);
+            root.Add(ghTPanel);
+            VisualElement geTPanel = new VisualElement();
+            geTPanel.AddToClassList("GiteeTokenPanel");
+            TextField giteeToken = new TextField("Gitee Token")
+            {
+                value = GiteeAPI.Token,
+                isPasswordField = true
+            };
+            giteeToken.AddToClassList("GiteeToken");
+            giteeToken.RegisterCallback<ChangeEvent<string>>((evt) =>
+            {
+                GiteeAPI.Token = evt.newValue;
+            });
+            geTPanel.Add(giteeToken);
+            Button geGetToken = new Button(() =>
+            {
+                Application.OpenURL("https://gitee.com/profile/personal_access_tokens");
+            })
+            {
+                text = "Get Token"
+            };
+            geGetToken.AddToClassList("GetToken");
+            geTPanel.Add(geGetToken);
+            root.Add(geTPanel);
+            return root;
+        }
         class UGMUI
         {
             /// <summary>
@@ -227,8 +265,8 @@ namespace Sonic853.UpmGithubManager
             /// <summary>
             /// Github 分组
             /// </summary>
-            public ListView githubList;
-            public List<GithubItem> githubItems;
+            public ListView gitList;
+            public List<GitItem> gitItems;
         }
         class EditPanelUI
         {
@@ -243,7 +281,7 @@ namespace Sonic853.UpmGithubManager
             public VisualElement versionsVE;
             public PopupField<string> versionsField;
             public Button saveButton;
-            public async Task SetItem(GithubItem item)
+            public async Task SetItem(GitItem item)
             {
                 nameField.value = item.name;
                 urlField.value = item.sourceUrl;
@@ -251,8 +289,20 @@ namespace Sonic853.UpmGithubManager
                 versionField.value = item.version == "#latest#" ? "" : item.version;
                 versionsField.SetEnabled(false);
                 saveButton.SetEnabled(false);
-                var tags = await GithubAPI.GetTags(item.sourceUrl);
-                var branches = await GithubAPI.GetBranches(item.sourceUrl);
+                var tags = new string[0];
+                var branches = new string[0];
+                if (item.sourceUrl.StartsWith("https://github.com/")
+                || item.sourceUrl.StartsWith("ssh://git@github.com/"))
+                {
+                    tags = await GithubAPI.GetTags(item.sourceUrl);
+                    branches = await GithubAPI.GetBranches(item.sourceUrl);
+                }
+                else if (item.sourceUrl.StartsWith("https://gitee.com/")
+                || item.sourceUrl.StartsWith("ssh://git@gitee.com/"))
+                {
+                    tags = await GiteeAPI.GetTags(item.sourceUrl);
+                    branches = await GiteeAPI.GetBranches(item.sourceUrl);
+                }
                 versions.Clear();
                 versions.Add("custom");
                 foreach (var tag in tags)
@@ -297,10 +347,10 @@ namespace Sonic853.UpmGithubManager
                 // return item;
             }
         }
-        static Func<VisualElement> makeGithubItem = () =>
+        static Func<VisualElement> makeGitItem = () =>
         {
             Label item = new Label();
-            item.AddToClassList("githubItem");
+            item.AddToClassList("gitItem");
             Label nameLabel = new Label("Name: ");
             nameLabel.name = "name";
             item.Add(nameLabel);
@@ -309,13 +359,13 @@ namespace Sonic853.UpmGithubManager
             item.Add(versionLabel);
             return item;
         };
-        static Action<VisualElement, int> bindGithubItem = (VisualElement item, int index) =>
+        static Action<VisualElement, int> bindGitItem = (VisualElement item, int index) =>
         {
-            GithubItem githubItem = githubItems[index];
+            GitItem gitItem = gitItems[index];
             Label nameLabel = item.Q<Label>("name");
             Label versionLabel = item.Q<Label>("version");
-            nameLabel.text = "Name: " + githubItems[index].name;
-            versionLabel.text = "Version: " + (githubItems[index].version == "#latest#" ? "latest" : githubItems[index].version);
+            nameLabel.text = "Name: " + gitItems[index].name;
+            versionLabel.text = "Version: " + (gitItems[index].version == "#latest#" ? "latest" : gitItems[index].version);
         };
     }
 }

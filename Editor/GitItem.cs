@@ -2,7 +2,7 @@
 
 namespace Sonic853.UpmGithubManager
 {
-        class GithubItem
+        class GitItem
         {
             /// <summary>
             /// 包名
@@ -18,12 +18,12 @@ namespace Sonic853.UpmGithubManager
             {
                 get
                 {
-                    return _url + "?path=" + path + (version == "#latest#" ? "" : ("#" + version));
+                    return _url.Trim() + (string.IsNullOrEmpty(path.Trim()) ? "" : ("?path=" + path.Trim())) + ((version.Trim() == "#latest#" || string.IsNullOrEmpty(version.Trim())) ? "" : ("#" + version.Trim()));
                 }
                 set
                 {
                     oldUrl = value;
-                    string[] urlSplit = value.Split('#');
+                    string[] urlSplit = value.Trim().Split('#');
                     if (urlSplit.Length > 1)
                     {
                         version = urlSplit[1];
