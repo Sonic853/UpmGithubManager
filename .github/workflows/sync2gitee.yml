@@ -1,0 +1,36 @@
+# 每次提交后自动同步到 Gitee
+name: Sync to Gitee
+
+on:
+  push:
+      branches: [main]
+  pull_request:
+      branches: [main]
+
+jobs:
+  update:
+    name: Sync to Gitee
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: Get repo and time
+        id: info
+        uses: actions/github-script@v6
+        with:
+          result-encoding: string
+          script: |
+            core.setOutput('time', new Date(Date.now()).toISOString().replace(/[^0-9]/g, ""));
+            core.setOutput('key', `${context.repo.owner}-${context.repo.repo}`);
+            return context.repo.repo;
+      
+      - name: Mirror the GitHub repos to Gitee
+        uses: Yikun/hub-mirror-action@v0.13
+        with:
+          src: github/Sonic853
+          dst: gitee/Sonic853
+          dst_key: ${{ secrets.GITEE_PRIVATE_KEY }}
+          dst_token: ${{ secrets.GITEE_TOKEN }}
+          static_list: '${{ steps.info.outputs.result }}'
+          cache_path: ${{ github.workspace }}/hub-mirror-cache
+          account_type: user
+          force_update: true
