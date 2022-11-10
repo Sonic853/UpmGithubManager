@@ -14,7 +14,7 @@ openupm add com.sonic853.upm-github-manager
 
 1. Open "Package Manager"
 2. Click "+", then click "Add package from git URL..."
-3. Type "`https://github.com/Sonic853/UpmGithubManager.git#0.3.0`" and press Enter.
+3. Type "`https://github.com/Sonic853/UpmGithubManager.git#0.3.1`" and press Enter.
 4. Done!
 
 # 中文
@@ -31,5 +31,5 @@ openupm-cn add com.sonic853.upm-github-manager
 
 1. 打开 "Package Manager"
 2. 点击 "+" 号, 然后点击 "Add package from git URL..."。
-3. 输入 "`https://gitee.com/Sonic853/UpmGithubManager.git#0.3.0`" 后按回车键。
+3. 输入 "`https://gitee.com/Sonic853/UpmGithubManager.git#0.3.1`" 后按回车键。
 4. 完成！
