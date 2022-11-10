@@ -6,7 +6,7 @@ using UnityEngine.Networking;
 
 namespace Sonic853.UpmGithubManager
 {
-    public class GiteeAPI
+    class GiteeAPI
     {
         /// <summary>
         /// 查询用的 Token，如果不填写，每小时只能查询 60 次
