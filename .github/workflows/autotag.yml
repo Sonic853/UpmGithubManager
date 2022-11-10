@@ -30,22 +30,12 @@ jobs:
       - name: Get new version
         id: new_version
         run: echo "version=$(cat .github/AutoWriteVersion/version.txt)" >> $GITHUB_OUTPUT
-      - name: Check Version
-        if: steps.check_version.outputs.version != steps.current_version.outputs.version
-        run: |
-          echo "New Version: ${{ steps.new_version.outputs.version }}"
-      - name: Import GPG key
-        uses: crazy-max/ghaction-import-gpg@v5.2
-        with:
-          gpg_private_key: ${{ secrets.GH_GPG }}
-          git_config_global: true
-          git_user_signingkey: true
-          git_commit_gpgsign: true
-          git_tag_gpgsign: true
       - name: Commit and Set Tag
+        if: steps.new_version.outputs.version != steps.current_version.outputs.version
         run: |
+          git config --global user.name "Sonic853"
+          git config --global user.email "${{ secrets.GH_MAIL }}"
           git add .
-          git commit -S -m "chore(workflow): update version to ${{ steps.new_version.outputs.version }}"
+          git commit -m "chore(workflow): update version to ${{ steps.new_version.outputs.version }}"
           git tag -a ${{ steps.new_version.outputs.version }} -m "chore(workflow): update version to ${{ steps.new_version.outputs.version }}"
           git push --follow-tags
-          gpg --batch --yes --delete-secret-keys ${{ secrets.GH_GPG_KEY_ID }}
