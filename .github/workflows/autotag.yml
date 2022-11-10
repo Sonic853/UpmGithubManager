@@ -46,6 +46,6 @@ jobs:
       - name: Commit and Set Tag
         run: |
           git add .
-          git commit -m "chore(workflow): update version to ${{ steps.new_version.outputs.version }}"
+          git commit -S -m "chore(workflow): update version to ${{ steps.new_version.outputs.version }}"
           git tag -a ${{ steps.new_version.outputs.version }} -m "chore(workflow): update version to ${{ steps.new_version.outputs.version }}"
           git push --follow-tags
