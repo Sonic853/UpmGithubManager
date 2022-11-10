@@ -47,7 +47,6 @@ jobs:
           git config --global user.name "Sonic853"
           git config --global user.email "${{ secrets.GH_MAIL }}"
           echo "${{ secrets.GH_GPG }}" | gpg --import
-          gpg --batch --yes --default-key ${{ secrets.GH_GPG_KEY_ID }}
           git add .
           git commit -S -m "chore(workflow): update version to ${{ steps.new_version.outputs.version }}"
           git tag -a ${{ steps.new_version.outputs.version }} -m "chore(workflow): update version to ${{ steps.new_version.outputs.version }}"
